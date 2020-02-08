@@ -1,4 +1,5 @@
 import 'package:bitlarm/price_sheet.dart';
+import 'package:bitlarm/store/price_store.dart';
 import 'package:flutter/material.dart';
 
 class PriceIndex extends StatefulWidget {
@@ -7,6 +8,16 @@ class PriceIndex extends StatefulWidget {
 }
 
 class _PriceIndexState extends State<PriceIndex> {
+  PriceStore priceStore = PriceStore();
+
+  int price;
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveHighPrice();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +26,6 @@ class _PriceIndexState extends State<PriceIndex> {
           title: Text("Bitlarm"),
         ),
         body: SafeArea(
-          bottom: true,
           child: Container(
             child: Center(
               child: Column(
@@ -35,6 +45,14 @@ class _PriceIndexState extends State<PriceIndex> {
                   SizedBox(
                     height: 20,
                   ),
+                  Text(
+                    "Your current high price is \$$price",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   FlatButton(
                     padding: EdgeInsets.only(left: 20, right: 20),
                     color: Colors.blue,
@@ -45,7 +63,11 @@ class _PriceIndexState extends State<PriceIndex> {
                         builder: (BuildContext context) {
                           return PriceSheet();
                         },
-                      );
+                      ).whenComplete(() async {
+                        await _retrieveHighPrice();
+                      });
+
+                      setState(() {});
                     },
                     child: Text(
                       "Set Price",
@@ -57,5 +79,12 @@ class _PriceIndexState extends State<PriceIndex> {
             ),
           ),
         ));
+  }
+
+  _retrieveHighPrice() async {
+    price = await priceStore.getHighPrice();
+    setState(() {
+      price = price;
+    });
   }
 }

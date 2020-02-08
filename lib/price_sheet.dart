@@ -1,3 +1,4 @@
+import 'package:bitlarm/store/price_store.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,13 +10,14 @@ class PriceSheet extends StatefulWidget {
 class _PriceSheetState extends State<PriceSheet> {
   final priceController = TextEditingController();
   bool _priceValidate = false;
-
   int price;
+
+  PriceStore priceStore = PriceStore();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 500,
+        height: 250,
         decoration: new BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -68,7 +70,8 @@ class _PriceSheetState extends State<PriceSheet> {
                   color: Colors.blue,
                   onPressed: () {
                     if (_validateForm()) {
-                      _savePrice(price);
+                      _saveHighPrice(price);
+                      Navigator.pop(context);
                     }
                     setState(() {});
                   },
@@ -100,9 +103,7 @@ class _PriceSheetState extends State<PriceSheet> {
     return valid;
   }
 
-  _savePrice(int amount) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt('price', amount);
+  _saveHighPrice(int amount) async {
+    await priceStore.setHighPrice(amount);
   }
 }

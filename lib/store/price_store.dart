@@ -2,8 +2,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PriceStore {
   SharedPreferences _prefs;
-  final String _highPrice = 'high_price';
-  final String _lowPrice = 'low_price';
 
   PriceStore() {
     _init();
@@ -13,12 +11,21 @@ class PriceStore {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  _setHighPrice(int price) async {
+  setHighPrice(int price) async {
     await _prefs.setInt(PriceStoreKeys.HIGH_PRICE, price);
   }
 
-  _setLowPrice(int price) async {
+  setLowPrice(int price) async {
     await _prefs.setInt(PriceStoreKeys.LOW_PRICE, price);
+  }
+
+  getHighPrice() async {
+    _prefs = await SharedPreferences.getInstance();
+    return _prefs.getInt(PriceStoreKeys.HIGH_PRICE) ?? 0;
+  }
+
+  getLowPrice() async {
+    return _prefs.getInt(PriceStoreKeys.LOW_PRICE) ?? 0;
   }
 }
 
