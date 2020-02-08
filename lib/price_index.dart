@@ -32,7 +32,7 @@ class _PriceIndexState extends State<PriceIndex> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "USD 120,000",
+                    "\$120,000",
                     style: TextStyle(fontSize: 30.0),
                   ),
                   SizedBox(
