@@ -1,6 +1,9 @@
+import 'package:bitlarm/podo/response.dart';
 import 'package:bitlarm/price_sheet.dart';
 import 'package:bitlarm/store/price_store.dart';
+import 'package:bitlarm/util.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class PriceIndex extends StatefulWidget {
   @override
@@ -12,9 +15,14 @@ class _PriceIndexState extends State<PriceIndex> {
 
   int price;
 
+  String btcPrice;
+
+  Util util = Util();
+
   @override
   void initState() {
     super.initState();
+    _fetchCurrentPrice();
     _retrieveHighPrice();
   }
 
@@ -32,7 +40,7 @@ class _PriceIndexState extends State<PriceIndex> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "\$120,000",
+                    btcPrice == null ? "0" : btcPrice,
                     style: TextStyle(fontSize: 30.0),
                   ),
                   SizedBox(
@@ -46,7 +54,7 @@ class _PriceIndexState extends State<PriceIndex> {
                     height: 20,
                   ),
                   Text(
-                    "Your current high price is \$$price",
+                    "Your high price is current set at \$$price",
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.blue),
                   ),
@@ -86,5 +94,16 @@ class _PriceIndexState extends State<PriceIndex> {
     setState(() {
       price = price;
     });
+  }
+
+  _fetchCurrentPrice() async {
+    var responseData = await http.get(util.getBtcUSDURL());
+    if (responseData.statusCode == 200) {
+      // print('Response body: ${response.body}');
+      final response = responseFromJson(responseData.body);
+      setState(() {
+        btcPrice = "\$${response.rate.toString()}";
+      });
+    }
   }
 }
