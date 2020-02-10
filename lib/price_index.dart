@@ -22,7 +22,7 @@ class _PriceIndexState extends State<PriceIndex> {
   @override
   void initState() {
     super.initState();
-    _fetchCurrentPrice();
+    // _fetchCurrentPrice();
     _retrieveHighPrice();
   }
 
@@ -39,10 +39,34 @@ class _PriceIndexState extends State<PriceIndex> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(
-                    btcPrice == null ? "0" : btcPrice,
-                    style: TextStyle(fontSize: 30.0),
-                  ),
+                  FutureBuilder(
+                      future: _fetchCurrentPrice(),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                            return CircularProgressIndicator();
+
+                          case ConnectionState.active:
+                            return CircularProgressIndicator();
+
+                          case ConnectionState.waiting:
+                            return CircularProgressIndicator();
+
+                          case ConnectionState.done:
+                            if (snapshot.hasError) {
+                              return Text(
+                                '${snapshot.error}',
+                                style: TextStyle(color: Colors.red),
+                              );
+                            } else {
+                              print(btcPrice);
+                              return Text(
+                                btcPrice == null ? "" : btcPrice,
+                                style: TextStyle(fontSize: 30.0),
+                              );
+                            }
+                        }
+                      }),
                   SizedBox(
                     height: 20,
                   ),
@@ -98,12 +122,15 @@ class _PriceIndexState extends State<PriceIndex> {
 
   _fetchCurrentPrice() async {
     var responseData = await http.get(util.getBtcUSDURL());
+
     if (responseData.statusCode == 200) {
-      // print('Response body: ${response.body}');
+      // print('Response body: ${responseData.body}');
       final response = responseFromJson(responseData.body);
       setState(() {
         btcPrice = "\$${response.rate.toString()}";
       });
+    } else {
+      return print("An error occurred! ${responseData.statusCode}");
     }
   }
 }
